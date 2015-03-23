@@ -1,7 +1,10 @@
-# ResponseUtil
+# httputil
 # @author : SJ
 # @date : 2015.03.22
-# @purpose : response util class for shodan study
+# @purpose : http util class for shodan study
+
+## TO_DO : sending http request asynchronously 
+##		   with ip address from config file
 
 import urllib2;
 
@@ -16,18 +19,7 @@ class Request(urllib2.Request) :
 		self.url = url;
 		self.timeout = timeout;
 		urllib2.Request.__init__(self, url);
-	# from : request start Ip [e.g 100.100.220.1]
-	# to[optional] : request end Ip [e.g 100.100.220.99]
-	# timeout[optional , default = 5second] : request timeout
 
-	# def __init__(self, fromIp, toIp , timeout = 5):
-	# 	self.fromIp = fromIp;
-	# 	if not toIp : toIp = fromIp;
-	# 	self.to = to;
-	# 	self.timeout = timeout;
-
-	def setUrl(self, url):
-		self.url = url;
 
 	def setTimeout(self, timeout):
 		self.timeout = timeout;
@@ -51,7 +43,7 @@ class Response:
 
 	# return : url
 	def getUrl(self):
-		return self.connection.get_full_url();
+		return self.url;
 
 	# return : headerInfo *dictionary
 	def getHeader(self):
@@ -74,6 +66,9 @@ class Response:
 
 	# To figure out which server is used in web site
 	# return : server name
+
+	## TO_DO : logic to determin server name
+
 	def getServerInfo(self):
 		self.server="";
 		# ServerInfo
@@ -85,8 +80,6 @@ class Response:
 			# add different server name logic from here
 			if temp.find("JBoss".lower()) > 0:
 				self.server = "JBoss";
-			elif temp.find("Php".lower()) > 0:
-				self.server = "PHP";
 			elif temp.find("Tomcat".lower()) > 0:
 				self.server = "Tomcat";
 			else :
@@ -95,26 +88,39 @@ class Response:
 			self.server = self.header.get("server");
 		return self.server;
 
+	def setErrorInfo(self, e):
+		if hasattr(e, "code") :
+			self.statusCode = e.code;
+		if hasattr(e, "headers") :
+			self.header = e.headers;
+		if hasattr(e, "args") and len(e.args) > 0 :
+			self.errorMessage = e.args[0];
+			print "[HTTP ERROR] : " + e.args[0];
 
-	def setStatusCode(self, statusCode) :
-		self.statusCode = statusCode;
-
+	def setUrl(self, url):
+		self.url = url;
 
 # @purpose : http request and get response
 # @param : request [urllib2 obj]
 #		 , timeout [ second]
 #		 , data [ request data] 
 def httpRequest(request , timeout =2 ,data=None):
+
 	connection = None;
+
 	if request.get_full_url().find("http://") :
 		raise Exception("Wrong Url [URL should be started with 'http://' ]");
 	try :
 		connection = urllib2.urlopen(request ,data ,timeout);
-	except Exception as e:
+	except Exception, e:
 		response= Response(None, False);
-		response.setStatusCode(e.code);
+		response.setErrorInfo(e);
 		return response;
-	return Response(connection);	
+
+	response = Response(connection);
+	response.setUrl(request.get_full_url());
+
+	return response;	
 	
 	
 ##  Github Commit Test
