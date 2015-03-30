@@ -2,31 +2,21 @@ import copy
 
 class test:
 	def __init__(self):
-		self.data = {};
-	def __setitem__(self,key,item):
-		self.data[key] = item
-	def __getitem__(self, key):
-		return self.hasattr(key) and self.data[key] or None
+		pass
 	def __contains__(self, key):
-		return key in self.data
+		return key in self.__dict__
 	def __delitem__(self, key):
-		del self.data[key]
+		del self.__dict__[key]
+	def __getattr__(self, key):
+		return hasattr(self, key) and self.__dict__[key] or None
+	def __setattr__(self, key ,value):
+		self.__dict__[key] = value
 	def copy(self):
 		return copy.deepcopy(self)
 	def get(self, key, failobj=None):
-		return self.data.get(key, failobj)
-	def hasattr(self,key):
-		return key in self.data
-
-
-t = test()
-t["a"] = {"test" : 1 }
-
-b = t.copy()
-b["a"] = 1
-del b["a"]
-print t.hasattr("a")
-print t["a"]
-print b["a"]
-print t.get("n" , "test")
-print t.get("a")
+		return self.__dict__.get(key, failobj)
+	
+	def __str__(self):
+		return str(self.__dict__)
+	def __len__(self):
+		return len(self.__dict__)
