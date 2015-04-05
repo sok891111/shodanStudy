@@ -7,10 +7,9 @@ class test:
 		return key in self.__dict__
 	def __delitem__(self, key):
 		del self.__dict__[key]
-	# getter 메소드
 	def __getattr__(self, key):
+		print "asdf"
 		return hasattr(self, key) and self.__dict__[key] or None
-	# setter 메소드
 	def __setattr__(self, key ,value):
 		self.__dict__[key] = value
 	def copy(self):
@@ -22,3 +21,6 @@ class test:
 		return str(self.__dict__)
 	def __len__(self):
 		return len(self.__dict__)
+
+
+t = test()

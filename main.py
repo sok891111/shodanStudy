@@ -1,7 +1,6 @@
 from httputil import *;
-from connectionutil import *;
 
-url ="http://118.176.52.12:8080"
+url ="http://www.naver.com"
 request = Request(url);
 response = httpRequest(request);
 
@@ -10,5 +9,5 @@ if response.isSuccess() :
 	if result.isSuccess() :
 		print "login Success";
 	else :
-		message = "[Status Code "+str(result.getStatusCode()) +"] >>> login Fail";
+		message = "[Status Code "+str(result.statusCode)+"] >>> login Fail" ;
 		print message;
