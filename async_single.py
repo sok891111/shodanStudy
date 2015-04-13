@@ -1,5 +1,5 @@
 import asyncore, socket, time
-
+""" single threaded async """
 class HTTPClient(asyncore.dispatcher):
 
     def __init__(self, host, path):
